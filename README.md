@@ -91,6 +91,8 @@ cp -R build/jswitcher.app /Applications/
 3. assembles `build/jswitcher.app` and signs it with hardened runtime — with the first «Developer ID Application» certificate in your keychain (or `$JSWITCHER_SIGN_IDENTITY`), otherwise ad-hoc;
 4. verifies that the binary has no network symbols and no entitlements.
 
+The app icon (`Resources/AppIcon.icns`) is drawn by code: edit `scripts/make-icon.swift` and run `scripts/make-icon.sh`.
+
 With an ad-hoc signature macOS forgets the Accessibility permission on every rebuild: remove jswitcher from the list with «−» and grant it again.
 
 ### Releases

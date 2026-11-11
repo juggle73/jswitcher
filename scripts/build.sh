@@ -24,7 +24,7 @@ rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$BIN" "$APP/Contents/MacOS/jswitcher"
 cp Resources/Info.plist "$APP/Contents/Info.plist"
-cp Resources/dict_en.bin Resources/dict_ru.bin Resources/dict_en_top.bin Resources/dict_ru_top.bin Resources/dict_tech.bin Resources/ngram_en.bin Resources/ngram_ru.bin LICENSE THIRD_PARTY_NOTICES.txt "$APP/Contents/Resources/"
+cp Resources/dict_en.bin Resources/dict_ru.bin Resources/dict_en_top.bin Resources/dict_ru_top.bin Resources/dict_tech.bin Resources/ngram_en.bin Resources/ngram_ru.bin Resources/AppIcon.icns LICENSE THIRD_PARTY_NOTICES.txt "$APP/Contents/Resources/"
 
 # Signing identity: $JSWITCHER_SIGN_IDENTITY, else the first "Developer ID Application" in the
 # keychain, else ad-hoc. A real certificate keeps macOS permissions across rebuilds; ad-hoc doesn't.

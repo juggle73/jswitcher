@@ -89,6 +89,8 @@ cp -R build/jswitcher.app /Applications/
 3. собирает `build/jswitcher.app` и подписывает с hardened runtime — первым сертификатом «Developer ID Application» из «Связки ключей» (или `$JSWITCHER_SIGN_IDENTITY`), иначе ad-hoc;
 4. проверяет, что в бинарнике нет сетевых символов и entitlement-ов.
 
+Иконка (`Resources/AppIcon.icns`) рисуется кодом: правьте `scripts/make-icon.swift` и запустите `scripts/make-icon.sh`.
+
 С подписью ad-hoc macOS забывает право «Универсальный доступ» после каждой пересборки: удалите jswitcher из списка кнопкой «−» и выдайте право заново.
 
 ### Релизы
