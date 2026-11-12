@@ -52,8 +52,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             guard let self else { return Unmanaged.passUnretained(event) }
             return self.handle(proxy: proxy, type: type, event: event)
         }
+        Log.launched(version: Self.version, accessibilityGranted: Permissions.granted)
         if !startTapIfPermitted() {
-            Permissions.request()
+            // The system prompt is shown by itself only once, on the very first launch. Later launches
+            // without access only show ⚠︎ and the menu items: right after login macOS may briefly answer
+            // "not trusted" although access is granted, and a prompt then would be false.
+            if !UserDefaults.standard.bool(forKey: Self.accessibilityAskedKey) {
+                UserDefaults.standard.set(true, forKey: Self.accessibilityAskedKey)
+                Permissions.request()
+                Log.permissionPromptShown(secondsSinceLaunch: secondsSinceLaunch)
+            }
             // Poll only until permissions arrive, then stop.
             permissionTimer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { [weak self] _ in
                 MainActor.assumeIsolated {
@@ -66,8 +74,34 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         refreshStatus()
     }
 
+    /// Set once the system prompt was shown or access was seen granted: jswitcher is then in the
+    /// Accessibility list and never shows the prompt by itself again.
+    private static let accessibilityAskedKey = "accessibilityAsked"
+    private let launchedAt = ProcessInfo.processInfo.systemUptime
+
+    private var secondsSinceLaunch: Int { Int(ProcessInfo.processInfo.systemUptime - launchedAt) }
+
+    private static var version: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "?"
+    }
+
+    private var tapStartLogged = false
+    private var tapRefusalLogged = false
+
     private func startTapIfPermitted() -> Bool {
-        let started = Permissions.granted && (tap?.start() ?? false)
+        let granted = Permissions.granted
+        // Installs from before this flag existed: access already granted means the user was asked.
+        if granted { UserDefaults.standard.set(true, forKey: Self.accessibilityAskedKey) }
+        let started = granted && (tap?.start() ?? false)
+        if started {
+            if !tapStartLogged {
+                tapStartLogged = true
+                Log.tapStarted(secondsSinceLaunch: secondsSinceLaunch)
+            }
+        } else if granted, !tapRefusalLogged {
+            tapRefusalLogged = true
+            Log.tapStartRefused()
+        }
         refreshStatus()
         return started
     }
@@ -168,7 +202,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         case .tapDisabledByTimeout, .tapDisabledByUserInput:
             tap?.reenable()
             resetEngine()
-            Log.tapReenabled()
+            Log.tapDisabled(byTimeout: type == .tapDisabledByTimeout)
             return pass
         default:
             break

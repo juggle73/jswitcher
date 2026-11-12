@@ -57,8 +57,17 @@ private func eventTapCallback(
 ) -> Unmanaged<CGEvent>? {
     guard let refcon else { return Unmanaged.passUnretained(event) }
     let call = TapCall(proxy: proxy, type: type, event: event, refcon: refcon)
-    return MainActor.assumeIsolated {
+    let started = DispatchTime.now().uptimeNanoseconds
+    let result = MainActor.assumeIsolated {
         let tap = Unmanaged<EventTap>.fromOpaque(call.refcon).takeUnretainedValue()
         return TapResult(value: tap.handler(call.proxy, call.type, call.event))
     }.value
+    let elapsedMs = Int((DispatchTime.now().uptimeNanoseconds - started) / 1_000_000)
+    if elapsedMs >= slowCallbackThresholdMs {
+        Log.slowCallback(eventType: type.rawValue, milliseconds: elapsedMs)
+    }
+    return result
 }
+
+/// Every keystroke waits for this callback, so anything this slow is felt as input lag.
+private let slowCallbackThresholdMs = 100

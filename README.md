@@ -35,7 +35,7 @@ Tested on macOS 14 (Apple Silicon). macOS 13 and Intel Macs should work but have
 2. Unzip, move `jswitcher.app` to `/Applications`, open it.
 3. macOS will ask for **Accessibility** access: enable jswitcher in System Settings → Privacy & Security → Accessibility.
 
-While the permission is missing the menu-bar icon shows `⚠︎`; the menu has items to open the settings and to relaunch the app. Usually the app starts working within 2 seconds after the permission is granted.
+While the permission is missing the menu-bar icon shows `⚠︎`; the menu has items to open the settings and to relaunch the app. Usually the app starts working within 2 seconds after the permission is granted. jswitcher shows the macOS permission prompt by itself only once, on first launch; later it never asks again and only shows `⚠︎`.
 
 **Launch at login.** On first launch jswitcher adds itself to Login Items. To disable: System Settings → General → Login Items (it won't re-add itself). To turn jswitcher off completely, choose «Выход» (Quit) in its menu.
 
